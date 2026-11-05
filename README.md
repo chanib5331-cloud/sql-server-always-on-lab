@@ -35,7 +35,7 @@ A hands-on lab that builds a two-node **SQL Server 2022 Always On Availability G
 
 Measured in this lab, on a sample table of 200,000 rows.
 
-**Index tuning.** The same query, before and after a covering index, returned the same 1,250 rows. The final plan uses an Index Seek on the new index.
+**Index tuning.** The same query, before and after a covering index, returned the same 1,250 rows. The plan changed from a Clustered Index Scan to an Index Seek on the new index. Logical reads were identical across two separate builds of the lab, while CPU and elapsed times varied between runs (the table shows the first run).
 
 | Metric | Before | After |
 |---|---|---|
@@ -51,7 +51,7 @@ Measured in this lab, on a sample table of 200,000 rows.
 
 **Health monitoring.** With `sql2` stopped, the Agent job on `sql1` logged it as `DISCONNECTED` and `NOT_HEALTHY` and wrote an alert to the error log. The local row for `sql1` stayed `HEALTHY` during the outage, so the job reads the secondary's row as well. After `sql2` restarted, `LabDB` returned to `SYNCHRONIZED` with no manual action.
 
-**Backup and restore.** Full and log backups were restored to a separate database, and both databases had 200,001 rows.
+**Backup and restore.** `RESTORE VERIFYONLY` reported the full backup as valid. Full and log backups were then restored to a separate database, and the row counts matched the source in both runs.
 
 ## Run
 
