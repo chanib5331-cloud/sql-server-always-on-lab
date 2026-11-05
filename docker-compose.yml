@@ -1,0 +1,45 @@
+# SQL Server Always On Lab - two SQL Server 2022 instances (Developer edition)
+# sql1 = primary replica, sql2 = secondary replica
+services:
+  sql1:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql1
+    hostname: sql1
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Lab_Passw0rd!2026"
+      MSSQL_PID: "Developer"
+      MSSQL_AGENT_ENABLED: "true"   # SQL Server Agent (for monitoring jobs)
+      MSSQL_ENABLE_HADR: "1"        # enable Always On Availability Groups
+      MSSQL_MEMORY_LIMIT_MB: "2048" # keeps two instances from competing for WSL memory
+    ports:
+      - "14331:1433"                # SSMS: localhost,14331
+    volumes:
+      - ./scripts:/scripts:ro
+      - sql1data:/var/opt/mssql
+    networks: [aglab]
+
+  sql2:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql2
+    hostname: sql2
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Lab_Passw0rd!2026"
+      MSSQL_PID: "Developer"
+      MSSQL_AGENT_ENABLED: "true"
+      MSSQL_ENABLE_HADR: "1"
+      MSSQL_MEMORY_LIMIT_MB: "2048"
+    ports:
+      - "14332:1433"                # SSMS: localhost,14332
+    volumes:
+      - ./scripts:/scripts:ro
+      - sql2data:/var/opt/mssql
+    networks: [aglab]
+
+volumes:
+  sql1data:
+  sql2data:
+
+networks:
+  aglab:
